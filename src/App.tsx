@@ -1,25 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { createContext, useContext, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import styled from "styled-components";
+import "bootstrap/dist/css/bootstrap.min.css";
+import HomePage from "./pages/home";
+import AboutPage from "./pages/about";
+import { ChildrenProps } from "./components/types/children";
+import { ContextTypes } from "./components/types/context";
+
+// Create a context
+const MyContext = createContext<ContextTypes | null>(null);
+
+// Create a provider component
+export function MyProvider({ children }: ChildrenProps) {
+  const [value, setValue] = useState("initial value");
+
+  return (
+    <MyContext.Provider value={{ value, setValue }}>
+      {children}
+    </MyContext.Provider>
+  );
+}
+
+// Create a hook to use the context
+export function useMyContext() {
+  return useContext(MyContext);
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MyProvider>
+      <Router>
+        <Routes>
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </Router>
+    </MyProvider>
   );
 }
 

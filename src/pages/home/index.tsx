@@ -1,29 +1,26 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from "react";
+import React from "react";
 import { BigBadge } from "./styles";
 import { Row, Col, Card, Image, Button, Spinner } from "react-bootstrap";
 import PageLayout from "../../components/layout/page-layout";
 import Select from "react-select";
 import useCatBreeds from "../../hooks/use-catbreeds";
-import useCatImages from "../../hooks/use-catimages";
 import { CatBreed } from "../../components/types/cat-breed";
 import { CatThumb } from "../../components/types/cat-thumb";
+import { Link } from "react-router-dom";
+import { useCatContext } from "../../App";
 
 export default function HomePage() {
   const options = useCatBreeds();
-  const [page, setPage] = useState(1);
-  const [selectedBreed, setSelectedBreed] = useState<CatBreed | null>(null);
-  const { cats, loading, error, hasMore } = useCatImages(
-    selectedBreed?.value || "",
-    page
-  );
+  const { cats, setSelectedBreed, setPage, loading, error, hasMore } =
+    useCatContext();
 
   const handleLoadMore = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
-  const handleBreedChange = (selectedOption: CatBreed | null) => {
-    setSelectedBreed(selectedOption);
+  const handleBreedChange = (selectedBreed: CatBreed | null) => {
+    setSelectedBreed(selectedBreed ? selectedBreed.value : null);
     setPage(1);
   };
 
@@ -56,11 +53,10 @@ export default function HomePage() {
                     objectFit: "cover",
                   }}
                 />
-                <Card.Body className="d-flex flex-column justify-content-center align-items-center">
-                  <Card.Title>
-                    {selectedBreed?.label} :{cat.id}
-                  </Card.Title>
-                  <Button variant="primary">View Details</Button>
+                <Card.Body className="d-flex flex-column justify-content-center align-items-center v-30">
+                  <Link to={`/cat/${cat.id}`} className="btn btn-primary">
+                    View Details
+                  </Link>
                 </Card.Body>
               </Card>
             </Col>

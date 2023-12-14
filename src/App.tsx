@@ -1,41 +1,54 @@
 import React, { createContext, useContext, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import styled from "styled-components";
 import "bootstrap/dist/css/bootstrap.min.css";
 import HomePage from "./pages/home";
-import AboutPage from "./pages/about";
+import CatDetailsPage from "./pages/cat-details";
 import { ChildrenProps } from "./components/types/children";
-import { ContextTypes } from "./components/types/context";
+import { CatContextType } from "./components/types/cat-context";
+import useCatImages from "./hooks/use-catimages";
 
-// Create a context
-const MyContext = createContext<ContextTypes | null>(null);
+const CatContext = createContext<CatContextType | undefined>(undefined);
 
-// Create a provider component
-export function MyProvider({ children }: ChildrenProps) {
-  const [value, setValue] = useState("initial value");
+function CatProvider({ children }: ChildrenProps) {
+  const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const { cats, loading, error, hasMore } = useCatImages(selectedBreed, page);
 
   return (
-    <MyContext.Provider value={{ value, setValue }}>
+    <CatContext.Provider
+      value={{
+        cats,
+        selectedBreed,
+        setSelectedBreed,
+        page,
+        setPage,
+        loading,
+        error,
+        hasMore,
+      }}
+    >
       {children}
-    </MyContext.Provider>
+    </CatContext.Provider>
   );
 }
-
-// Create a hook to use the context
-export function useMyContext() {
-  return useContext(MyContext);
+export function useCatContext() {
+  const context = useContext(CatContext);
+  if (context === undefined) {
+    throw new Error("useCatContext must be used within a CatProvider");
+  }
+  return context;
 }
 
 function App() {
   return (
-    <MyProvider>
+    <CatProvider>
       <Router>
         <Routes>
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/cat/:id" element={<CatDetailsPage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
       </Router>
-    </MyProvider>
+    </CatProvider>
   );
 }
 

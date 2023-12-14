@@ -1,8 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState } from "react";
+import { CatBreedType } from "../components/types/cat-context";
 
-export default function useCatImages(breedId: string, page: number) {
-  const [cats, setCats] = useState<Array<{ id: string; url: string }>>([]);
+export default function useCatImages(breedId: string | null, page: number) {
+  const [cats, setCats] = useState<
+    Array<{ id: string; url: string; breeds: Array<CatBreedType> }>
+  >([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [prevBreedId, setPrevBreedId] = useState<string | null>(null);
@@ -43,7 +46,9 @@ export default function useCatImages(breedId: string, page: number) {
         }
       } catch (error) {
         if (error instanceof Error) {
-          setError(error.message);
+          setError(
+            "Apologies but we could not load new cats for you at this time! Miau!"
+          );
         }
       }
       setLoading(false);
